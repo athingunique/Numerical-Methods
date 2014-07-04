@@ -1,0 +1,43 @@
+% Evan Baker
+% EAB_HW04_P01
+% 12 February 2014
+
+% This script will solve a pre-pivoted matrix of nth dimension
+% First we call a modified version of the lab Gauss-Jorden script written in Lab04 - gaussJ.m - to do the actual solving
+% We then call the lab script again but modify the input arguments to recieve [a]^-1 from the elimination
+function EAB_HW04_P01
+a = input('Input matr a = '); % get coeff matr
+b = input('Input matr b = '); % get soln matr
+solnAB = gaussJ(a,b)%; % call elimination script
+mSolnAB = a \ b%;
+if solnAB = mSolnAB
+	disp('Solution verified with \ operator')
+	disp(solnAB)
+end
+
+sizeA = size(a); % get size of a for next step
+b = diag(1,sizeA(1)) % make a diagonal matrix b for inverting a
+invA = gaussJ(a,b)%; % call elimination script with a,b to invert a
+mInvA = a \ b%;
+if invA = mInvA
+	disp('Solution verified with \ operator')
+	disp(invA)
+end
+
+	function ab = gaussJ(a,b) % subfunc to solve matrix system
+	    ab = [a b]; % build augmented matr
+	    sizeab = size(ab); % get rows
+	    rowsab = sizeab(1);
+	    for i = 1:rowsab % iterating across the matr
+	        for j = 1:rowsab
+	            if i ~= j
+	                ab(j,:) = -ab(j,i)/ab(i,i) * ab(i,:) + ab(j,:);
+	            end
+	        end
+	    end
+	    for i = 1:rowsab
+	        ab(i,:) = ab(i,:)/ab(i,i);
+	    end
+	end
+end
+

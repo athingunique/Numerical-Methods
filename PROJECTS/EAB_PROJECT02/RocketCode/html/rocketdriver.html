@@ -1,0 +1,154 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>rocketdriver</title><meta name="generator" content="MATLAB 8.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-05-13"><meta name="DC.source" content="rocketdriver.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">% Evan Baker</span>
+<span class="comment">% 30 April 2014</span>
+
+<span class="comment">% This script will do rocket science.</span>
+<span class="comment">% http://xkcd.com/1133</span>
+
+<span class="keyword">function</span> rocketdriver
+<span class="keyword">global</span> g
+<span class="keyword">global</span> air velocity drag thrust burn hoop bball <span class="comment">% Make the objects global so we can edit them from anywhere</span>
+<span class="keyword">global</span> burnstart burnend
+
+<span class="comment">% INITIALIZING ALL THE VARIABLES</span>
+g = 9.81; <span class="comment">% Gravity [m/s^2]</span>
+airdensity = 1.298; <span class="comment">% Density of the air that we're flying through [kg/m^3]</span>
+bxpos = 0; <span class="comment">% Ball starts at x=0 [m]</span>
+bypos = 0; <span class="comment">% Ball starts at y=0 [m]</span>
+hxpos = 450; <span class="comment">% Goal x position [m]</span>
+hypos = 3; <span class="comment">% Goal y position [m]</span>
+v0 = 0; <span class="comment">% It starts out stationary [m/s]</span>
+vangle0 = 85; <span class="comment">% The angle that it starts out pointing at [degrees]</span>
+dragcoefficient = 0.47; <span class="comment">% Drag coefficient for a sphere</span>
+initialthrust = 0; <span class="comment">% No thrust before burns</span>
+burnstart = 0; <span class="comment">% Set of burn start times</span>
+burnend = 1; <span class="comment">% Coordinating set of burn end times</span>
+exitvelocity = 550; <span class="comment">% Fuel exit velocity [m/s]</span>
+massflow = .1; <span class="comment">% The mass flow rate of the burning fuel [kg/s]</span>
+hoopdiameter = 0.4572; <span class="comment">% Entry diameter [m]</span>
+ballmass = 0.567; <span class="comment">% Dry mass of basketball [kg]</span>
+balldiameter = .749/pi; <span class="comment">% Diameter of basketball [m]</span>
+
+
+
+<span class="comment">% Build these values into usable objects</span>
+[air,velocity,drag,thrust,burn,hoop,bball] = buildObjects(airdensity,bxpos,bypos,hxpos,hypos,v0,vangle0,dragcoefficient,initialthrust,burnstart,burnend,exitvelocity,massflow,hoopdiameter,ballmass,balldiameter);
+
+<span class="comment">% Build the gui control panel where the real magic happens</span>
+controlpanel
+
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="rocketdriver_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% Evan Baker
+% 30 April 2014
+
+% This script will do rocket science.
+% http://xkcd.com/1133
+
+function rocketdriver
+global g
+global air velocity drag thrust burn hoop bball % Make the objects global so we can edit them from anywhere
+global burnstart burnend
+
+% INITIALIZING ALL THE VARIABLES
+g = 9.81; % Gravity [m/s^2]
+airdensity = 1.298; % Density of the air that we're flying through [kg/m^3]
+bxpos = 0; % Ball starts at x=0 [m]
+bypos = 0; % Ball starts at y=0 [m]
+hxpos = 450; % Goal x position [m]
+hypos = 3; % Goal y position [m]
+v0 = 0; % It starts out stationary [m/s]
+vangle0 = 85; % The angle that it starts out pointing at [degrees]
+dragcoefficient = 0.47; % Drag coefficient for a sphere
+initialthrust = 0; % No thrust before burns
+burnstart = 0; % Set of burn start times
+burnend = 1; % Coordinating set of burn end times
+exitvelocity = 550; % Fuel exit velocity [m/s]
+massflow = .1; % The mass flow rate of the burning fuel [kg/s]
+hoopdiameter = 0.4572; % Entry diameter [m]
+ballmass = 0.567; % Dry mass of basketball [kg]
+balldiameter = .749/pi; % Diameter of basketball [m]
+
+
+
+% Build these values into usable objects
+[air,velocity,drag,thrust,burn,hoop,bball] = buildObjects(airdensity,bxpos,bypos,hxpos,hypos,v0,vangle0,dragcoefficient,initialthrust,burnstart,burnend,exitvelocity,massflow,hoopdiameter,ballmass,balldiameter);
+
+% Build the gui control panel where the real magic happens
+controlpanel
+
+end
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

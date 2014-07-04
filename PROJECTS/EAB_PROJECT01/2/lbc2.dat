@@ -1,0 +1,10 @@
+% lbc.dat
+% Loads and Boundary Conditions
+% $node $xconstrained $yconstrained $loadinx $loadiny
+% Positive is up, right, constrain states are true/false 1/0
+1 1 1 0 0 
+2 1 1 0 0
+3 0 0 0 450
+4 0 0 0 0
+5 1 1 0 0
+6 0 0 0 0
