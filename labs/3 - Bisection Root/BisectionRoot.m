@@ -4,7 +4,7 @@
 
 
 
-function EAB_LAB03
+function findRoot
     Fx = @ (x) x^3 - 5*x^2 -50*x -50;
     a = input('Start lower value a = ');
     b = input('Start upper value b = ');
